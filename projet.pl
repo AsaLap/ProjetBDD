@@ -1,6 +1,7 @@
 #!/usr/bin/perl
 use strict;
 use DBI;
+use experimental 'smartmatch';
 
 
 
@@ -15,30 +16,36 @@ open(testtab, '>Uniprottri.tab.txt') ;
 my @tmp;
 my @tmp2;
 my $dupli;
+my @list_keys;
 
-######Table EnsemblPlant
-while (<EnsemblPlant>) {
-  chomp;
-  @tmp= split(/,/,$_);
-  $dupli=1;
-  if(@tmp[2]){
-    if (@tmp[3]){
-    	$dbh+=$dbh;
-	     print csvtest "@tmp[0],@tmp[1],@tmp[2],@tmp[3]\n";
-    }
-    else {
-      print csvtest "@tmp[0],@tmp[1],@tmp[2],  \n";
-    }
-  }
-}
-
+# ######Table EnsemblPlant
+# while (<EnsemblPlant>) {
+#   chomp;
+#   @tmp= split(/,/,$_);
+#   $dupli=1;
+#   if(@tmp[2]){
+#     if(join(" ",@list_keys)=~/$tmp[2]/){
+#       $dbh+=$dbh;
+#     }
+#     else{
+#       push @list_keys, @tmp[2];
+#       if (@tmp[3]){
+#         $dbh+=$dbh;
+#         print csvtest "@tmp[0],@tmp[1],@tmp[2],@tmp[3]\n";
+#       }
+#       else {
+#         print csvtest "@tmp[0],@tmp[1],@tmp[2],  \n";
+#       }
+#     }
+#   }
+# }
 
 while(<Uniprot>){
   chomp;
   @tmp2= split(/\t/,$_);
   if (@tmp2[5]=~/.*Arabidopsis thaliana.*/) {
     $dbh+=$dbh;
-    print testtab "@tmp2[0] @tmp2[1]  @tmp2[2]  @tmp2[3]  @tmp2[4]  @tmp2[6]\n"
+    print testtab "@tmp2[0]\t@tmp2[1]\t@tmp2[2]\t@tmp2[3]\t@tmp2[4]\t@tmp2[6]\n"
 
   }
   # print testtab "@tmp2[0] @tmp2[1]  @tmp2[2]  @tmp2[3]  @tmp2[5]  @tmp2[6]\n"
