@@ -1,9 +1,6 @@
 #!/usr/bin/perl
 use strict;
 use DBI;
-use experimental 'smartmatch';
-
-
 
 my $dbh = DBI->connect("DBI:Pg:dbname=alaporte006;host=dbserver","alaporte006","MDPBases",{'RaiseError'=>1});
 
@@ -20,7 +17,7 @@ my @list_keys;
 my @list_keys2;
 my @list_keys3;
 
-#####Table EnsemblPlant
+#Remplissage des tables avec les données provenant d'EnsemblPlant
 while (<EnsemblPlant>) {
   chomp;
   @tmp= split(/,/,$_);
@@ -42,19 +39,20 @@ while (<EnsemblPlant>) {
   }
 }
 
-# while(<Uniprot>){
-#   chomp;
-#   $_=~tr/\'/ /;
-#   @tmp2= split(/\t/,$_);
-#   if (@tmp2[5]=~/.*Arabidopsis thaliana.*/) {
-#     if(join(" ",@list_keys2)=~/$tmp2[0]/){
-#       $dbh+=$dbh;
-#     }
-#     else{
-#       push @list_keys2,$tmp[0];
-#       push @list_keys3,$tmp[4];
-#       print testtab "@tmp2[0]\t@tmp2[1]\t@tmp2[2]\t@tmp2[3]\t@tmp2[4]\t@tmp2[6]\t@tmp2[7]\t@tmp2[8]\t@tmp2[9]\t@tmp2[10]\n";
-#       $dbh+=$dbh;
-#     }
-#   }
-# }
+#Remplissage des tables avec les données provenant d'Uniprot
+while(<Uniprot>){
+  chomp;
+  $_=~tr/\'/ /;
+  @tmp2= split(/\t/,$_);
+  if (@tmp2[5]=~/.*Arabidopsis thaliana.*/) {
+    if(join(" ",@list_keys2)=~/$tmp2[0]/){
+      $dbh+=$dbh;
+    }
+    else{
+      push @list_keys2,$tmp[0];
+      push @list_keys3,$tmp[4];
+      print testtab "@tmp2[0]\t@tmp2[1]\t@tmp2[2]\t@tmp2[3]\t@tmp2[4]\t@tmp2[6]\t@tmp2[7]\t@tmp2[8]\t@tmp2[9]\t@tmp2[10]\n";
+      $dbh+=$dbh;
+    }
+  }
+}
