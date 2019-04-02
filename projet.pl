@@ -1,10 +1,10 @@
 #!/usr/bin/perl
 use strict;
 
-open(EnsemblPlant, 'resources/mart_export.csv') ; #ouverture en lecture seule
-open(csvtest, '>resources/mart_exporttri.csv') ;
-open(Uniprot, 'resources/Uniprot.tab.txt');
-open(testtab, '>resources/Uniprottri.tab.txt') ;
+open(EnsemblPlant, 'mart_export.csv') ; #ouverture en lecture seule
+open(csvtest, '>mart_exporttri.csv') ;
+open(Uniprot, 'Uniprot.tab.txt');
+open(testtab, '>Uniprottri.tab.txt') ;
 
 my @tmp;
 my @tmp2;
