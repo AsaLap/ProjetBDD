@@ -17,7 +17,6 @@ my @list_keys3;
 while (<EnsemblPlant>) {
   chomp;
   @tmp= split(/,/,$_);
-  $dupli=1;
   if(@tmp[2]){
     if(join(" ",@list_keys)=~/$tmp[2]/){
     }
