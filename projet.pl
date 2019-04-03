@@ -2,9 +2,12 @@
 use strict;
 
 open(EnsemblPlant, 'mart_export.csv') ; #ouverture en lecture seule
-open(csvtest, '>mart_exporttri.csv') ;
+open(csvtest, '>mart_export_tri.csv') ;
 open(Uniprot, 'Uniprot.tab.txt');
-open(testtab, '>Uniprottri.tab.txt') ;
+open(testtab, '>Uniprot_tri.tab.txt') ;
+#NB : Sur les postes du CREMI, le tri sur Uniprot renvoie un fichier vide
+# nous avons donc déposé aussi un fichier au nom qui diffère : Uniprottri.tab.txt afin que vous
+# puissiez être témoin du tri effectué sans que le programme ne réécrive par dessus.
 
 my @tmp;
 my @tmp2;
@@ -17,6 +20,7 @@ my @list_keys3;
 while (<EnsemblPlant>) {
   chomp;
   @tmp= split(/,/,$_);
+  $dupli=1;
   if(@tmp[2]){
     if(join(" ",@list_keys)=~/$tmp[2]/){
     }
