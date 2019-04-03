@@ -153,7 +153,7 @@ sub menu(){
   } elsif ($reponse == 5){
     afficherProtByLen();
   } elsif ($reponse == 6){
-    afficherprotByEC();
+    afficherProtByEC();
   } elsif ($reponse == 0){
     exit;
   } else {
