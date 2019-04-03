@@ -15,6 +15,7 @@ sub requete{
       print join(" | ",@ref),"\n";
     }
   }
+  return $prep;
   $prep->finish;
 }
 
@@ -44,36 +45,87 @@ sub modifier{
 }
 
 sub afficherEnsemblProt{
-  requete("SELECT UniProtKB_TrEMBL_ID FROM Ensembl","search");
+  requete("SELECT UniProtKB_TrEMBL_ID FROM Ensembl","search","");
 }
 
 sub afficherGenes{
-  requete("SELECT GeneName FROM Gene JOIN Ensembl ON Gene.Entry=Ensembl.UniProtKB_TrEMBL_ID","search");
+  my $rep = requete("SELECT GeneName FROM Gene JOIN Ensembl ON Gene.Entry=Ensembl.UniProtKB_TrEMBL_ID","search");
+  print "Voulez-vous sauvegarder les résultats ? (O/N) (format HTML) : \n";
+  my $answer = <STDIN>;
+  chomp($answer);
+  if ($answer eq "O" || $answer eq "o"){
+    print "Donner un nom de fichier (sans l'extension): \n";
+    my $saveName = <STDIN>;
+    chomp($saveName);
+    save($rep,$saveName,"Nom des gènes du fichier Uniprot","GeneName");
+  } else {print "résultats non sauvegardés";}
 }
 
 sub afficherProtByLen{
   print "Quelle taille minimale souhaitez-vous ? :\n";
   my $length = <STDIN>;
   chomp($length);
-  requete("SELECT Entry,ProteinName,Length FROM Protein WHERE Length>=$length","search");
+  my $rep = requete("SELECT Entry,ProteinName,Length FROM Protein WHERE Length>=$length","search");
+  print "Voulez-vous sauvegarder les résultats ? (O/N) (format HTML) : \n";
+  my $answer = <STDIN>;
+  chomp($answer);
+  if ($answer eq "O" || $answer eq "o"){
+    print "Donner un nom de fichier (sans l'extension): \n";
+    my $saveName = <STDIN>;
+    chomp($saveName);
+    save($rep,$saveName,"Protéines récupérées en fonction de leur longueur","Entry","ProteinName","Length");
+  } else {print "résultats non sauvegardés";}
 }
 
-sub afficherProtByName{
+sub afficherProtByEC{
   print "Quelle EC voulez-vous aller chercher ? (format X.X.X.X) :\n";
   my $EC = <STDIN>;
   chomp($EC);
   while ($EC !~ /\d+\.\d+\.\d+\.\d+/){
     print "Format non respecté, veuillez réessayer (X.X.X.X) :\n";
-            $EC = <STDIN>;
-            chomp $EC;
+    $EC = <STDIN>;
+    chomp $EC;
   }
+  my $rep = requete("
+  SELECT p.entry, gl.status, p.ProteinName, g.GeneName, p.length, p.Sequence
+        FROM Protein p
+        JOIN General gl ON p.entry = gl.Entry
+        JOIN Gene g ON p.entry = g.Entry
+        JOIN Ensembl e ON p.entry = e.UniProtKB_TrEMBL_ID
+        WHERE p.ProteinName LIKE '%$EC%'","search");
+  print "Voulez-vous sauvegarder les résultats ? (O/N) (format HTML) : \n";
+  my $answer = <STDIN>;
+  chomp($answer);
+  if ($answer eq "O" || $answer eq "o"){
+    print "Donner un nom de fichier (sans l'extension): \n";
+    my $saveName = <STDIN>;
+    chomp($saveName);
+    save($rep,$saveName,"Protéines récupérées par leur EC","Entry","Status","ProteinName","GeneName","Length","Sequence");
+  } else {print "résultats non sauvegardés";}
+}
 
-  requete("
-  SELECT p.entry, gl.status, p.ProteinName, g.GeneName, p.length, p.Sequence FROM Protein p
-                JOIN General gl ON p.entry = gl.Entry
-                JOIN Gene g ON p.entry = g.Entry
-                JOIN Ensembl e ON p.entry = e.UniProtKB_TrEMBL_ID
-  WHERE p.ProteinName LIKE '%$EC%'","search");
+sub save{
+  my $resultQuery = shift;
+  my $fileName = shift;
+  my $title = shift;
+  my @columns = @_;
+  $resultQuery->execute();
+  $fileName = $fileName.".html";
+  open(my $file, '>',$fileName);
+  print $file "<!DOCTYPE html>\n<head>\n<meta charset='UTF-8'>\n</head>\n<body>\n";
+  print $file "<h1>$title</h1>\n";
+  print $file "<table>\n<thead>\n<tr>\n<th>";
+  print $file join("</th>\n<th>", @columns);
+  print $file "</th>\n</tr>\n</thead>\n<tbody>\n";
+  while (my @q = $resultQuery->fetchrow_array()){
+    for (@q){$_ = 'N.A' if !defined($_);}
+    print $file "<tr>\n<td>";
+    print $file join("</td>\n<td>", @q);
+    print $file "</td>\n</tr>\n";
+  }
+  print $file "</tbody>\n</table>\n</body>";
+  close($file);
+  print("Résultats sauvegardés\n");
 }
 
 sub menu(){
@@ -99,7 +151,7 @@ sub menu(){
   } elsif ($reponse == 5){
     afficherProtByLen();
   } elsif ($reponse == 6){
-    afficherProtByName();
+    afficherprotByEC();
   } elsif ($reponse == 0){
     exit;
   } else {
