@@ -87,12 +87,14 @@ sub afficherProtByEC{
     chomp $EC;
   }
   my $rep = requete("
-  SELECT p.entry, gl.status, p.ProteinName, g.GeneName, p.length, p.Sequence
+  SELECT DISTINCT gl.entry, gl.EntryName, gl.status, p.proteinName, p.length,
+    g.GeneName, g.Synonym, g.GeneOnthology, gl.EnsemblPlant,
+    e.GeneStableID, e.TranscriptStableID, e.PlantReactionID, p.Sequence
         FROM Protein p
         JOIN General gl ON p.entry = gl.Entry
         JOIN Gene g ON p.entry = g.Entry
-        JOIN Ensembl e ON p.entry = e.UniProtKB_TrEMBL_ID
-        WHERE p.ProteinName LIKE '%$EC%'","search");
+        LEFT OUTER JOIN Ensembl e ON p.entry = e.UniProtKB_TrEMBL_ID
+        WHERE p.proteinName LIKE '%$EC%'","search");
   print "Voulez-vous sauvegarder les résultats ? (O/N) (format HTML) : \n";
   my $answer = <STDIN>;
   chomp($answer);
@@ -100,7 +102,7 @@ sub afficherProtByEC{
     print "Donner un nom de fichier (sans l'extension): \n";
     my $saveName = <STDIN>;
     chomp($saveName);
-    save($rep,$saveName,"Protéines récupérées par leur EC","Entry","Status","ProteinName","GeneName","Length","Sequence");
+    save($rep,$saveName,"Protéines récupérées par leur EC","Entry", "EntryName", "Status", "ProteinName", "Length","GeneName", "Synonym", "GeneOnthology", "EnsemblPlant", "GeneStableID", "TranscriptStableID", "PlantReactionID", "Sequence");
   } else {print "résultats non sauvegardés";}
 }
 
